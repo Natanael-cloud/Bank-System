@@ -37,7 +37,7 @@ class Conta:
 
     @property
     def saldo(self):
-        return self.__saldo  # Retorno do saldo 
+        return self.__saldo  # Retorno  saldo 
 
     def nova_conta(self, cliente, numero):
         return Conta(numero, "001", cliente)
