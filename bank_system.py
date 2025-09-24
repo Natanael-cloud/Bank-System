@@ -4,90 +4,119 @@ from datetime import datetime
 # Interface Transacao
 class Transacao(ABC):
     def __init__(self):
-        self.data_hora = datetime.now()  # Data e hora da transação
+        self.__data_hora = datetime.now().strftime('%d/%m/%Y %H:%M:%S')  # Formato legível da data e hora
     
     @abstractmethod
     def registrar(self, conta):
         pass
+    
+    @property
+    def data_hora(self):
+        return self.__data_hora
 
 # Classe Historico
 class Historico:
     def __init__(self):
-        self.transacoes = []
+        self.__transacoes = []
 
     def adicionar_transacao(self, transacao):
-        self.transacoes.append(transacao)
+        self.__transacoes.append(transacao)
+
+    @property
+    def transacoes(self):
+        return self.__transacoes
 
 # Classe Conta
 class Conta:
     def __init__(self, numero, agencia, cliente):
-        self.numero = numero
-        self.agencia = agencia
-        self.saldo = 0.0
-        self.cliente = cliente
-        self.historico = Historico()
+        self.__numero = numero
+        self.__agencia = agencia
+        self.__saldo = 0.0
+        self.__cliente = cliente
+        self.__historico = Historico()
 
+    @property
     def saldo(self):
-        return self.saldo
+        return self.__saldo  # Retorno do saldo 
 
     def nova_conta(self, cliente, numero):
         return Conta(numero, "001", cliente)
 
     def sacar(self, valor):
-        if valor <= self.saldo:
-            self.saldo -= valor
+        if valor <= self.__saldo:
+            self.__saldo -= valor
             return True
         else:
             print("Saldo insuficiente!")
             return False
 
     def depositar(self, valor):
-        self.saldo += valor
+        self.__saldo += valor
         return True
 
 # Classe Deposito
 class Deposito(Transacao):
     def __init__(self, valor):
         super().__init__()
-        self.valor = valor
+        self.__valor = valor
 
     def registrar(self, conta):
-        conta.depositar(self.valor)
-        conta.historico.adicionar_transacao(self)
-        print(f"Depósito de R${self.valor} realizado na conta {conta.numero}. Data: {self.data_hora}")
+        conta.depositar(self.__valor)
+        conta._Conta__historico.adicionar_transacao(self)
+        print(f"Depósito de R${self.__valor} realizado na conta {conta._Conta__numero}. Data: {self.data_hora}")
 
 # Classe Saque
 class Saque(Transacao):
     def __init__(self, valor):
         super().__init__()
-        self.valor = valor
+        self.__valor = valor
 
     def registrar(self, conta):
-        if conta.sacar(self.valor):
-            conta.historico.adicionar_transacao(self)
-            print(f"Saque de R${self.valor} realizado na conta {conta.numero}. Data: {self.data_hora}")
+        if conta.sacar(self.__valor):
+            conta._Conta__historico.adicionar_transacao(self)
+            print(f"Saque de R${self.__valor} realizado na conta {conta._Conta__numero}. Data: {self.data_hora}")
         else:
-            print(f"Saque de R${self.valor} falhou na conta {conta.numero}. Data: {self.data_hora}")
+            print(f"Saque de R${self.__valor} falhou na conta {conta._Conta__numero}. Data: {self.data_hora}")
 
 # Classe Cliente
 class Cliente:
     def __init__(self, nome, endereco):
-        self.nome = nome
-        self.endereco = endereco
-        self.contas = []
+        self.__nome = nome
+        self.__endereco = endereco
+        self.__contas = []
 
     def realizar_transacao(self, conta, transacao):
         transacao.registrar(conta)
 
     def adicionar_conta(self, conta):
-        self.contas.append(conta)
+        self.__contas.append(conta)
+
+    @property
+    def nome(self):
+        return self.__nome
+    
+    @property
+    def endereco(self):
+        return self.__endereco
+    
+    @property
+    def contas(self):
+        return self.__contas
 
 # Classe PessoaFisica
 class PessoaFisica(Cliente):
     def __init__(self, cpf, nome, data_nascimento, endereco):
         super().__init__(nome, endereco)
-        self.cpf = cpf
-        self.data_nascimento = data_nascimento
+        self.__cpf = cpf
+        self.__data_nascimento = data_nascimento
+
+    @property
+    def cpf(self):
+        return self.__cpf
+    
+    @property
+    def data_nascimento(self):
+        return self.__data_nascimento
 
 # Função para interagir com o usuário via terminal
 def menu():
@@ -122,7 +151,7 @@ def main():
             if cpf in clientes:
                 cliente = clientes[cpf]
                 numero_conta = int(input("Informe o número da conta para depósito: "))
-                conta = next((c for c in cliente.contas if c.numero == numero_conta), None)
+                conta = next((c for c in cliente.contas if c._Conta__numero == numero_conta), None)
                 if conta:
                     valor = float(input("Informe o valor para depósito: "))
                     deposito = Deposito(valor)
@@ -137,7 +166,7 @@ def main():
             if cpf in clientes:
                 cliente = clientes[cpf]
                 numero_conta = int(input("Informe o número da conta para saque: "))
-                conta = next((c for c in cliente.contas if c.numero == numero_conta), None)
+                conta = next((c for c in cliente.contas if c._Conta__numero == numero_conta), None)
                 if conta:
                     valor = float(input("Informe o valor para saque: "))
                     saque = Saque(valor)
@@ -152,9 +181,9 @@ def main():
             if cpf in clientes:
                 cliente = clientes[cpf]
                 numero_conta = int(input("Informe o número da conta para consultar saldo: "))
-                conta = next((c for c in cliente.contas if c.numero == numero_conta), None)
+                conta = next((c for c in cliente.contas if c._Conta__numero == numero_conta), None)
                 if conta:
-                    print(f"Saldo da conta {conta.numero}: R${conta.saldo}")
+                    print(f"Saldo da conta {conta._Conta__numero}: R${conta.saldo}")
                 else:
                     print("Conta não encontrada!")
             else:
